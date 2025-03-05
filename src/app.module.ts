@@ -19,6 +19,7 @@ import { Product } from './products/entities/product.entity';
 import { Permission } from './permissions/entities/permission.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ConfigModule } from '@nestjs/config';
     RolesModule,
     PermissionsModule,
     AuthModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

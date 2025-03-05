@@ -13,11 +13,13 @@ import {
   Patch,
   NotFoundException,
   HttpException,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { QueryDto } from './dto/query.dto';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -34,13 +36,18 @@ export class UserController {
   }
 
   @Get()
-  async getAll() {
-    const users = await this.userService.getAll();
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Users fetched successfully',
-      data: users,
-    };
+  async findAll(@Query() query: QueryDto) {
+    try {
+      const admins = await this.userService.findAll(query);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Thành công',
+        data: admins,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get(':id')

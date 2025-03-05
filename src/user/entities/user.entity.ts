@@ -6,6 +6,7 @@ import {
     UpdateDateColumn,
     ManyToMany,
     JoinTable,
+    DeleteDateColumn,
   } from 'typeorm';
   import { Role } from 'src/roles/entities/role.entity';
   
@@ -43,7 +44,9 @@ import {
   
     @UpdateDateColumn()
     modifiedDate: Date;
-    
+
+    deletedAt?: Date;
+
   
     @ManyToMany(() => Role, (role) => role.users)
     @JoinTable({

@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { instanceToPlain } from 'class-transformer';
+import { QueryDto } from './dto/query.dto';
 
 @Injectable()
 export class UserService {
@@ -26,8 +27,42 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async getAll(): Promise<User[]> {
-    return await this.userRepository.find({relations:["roles"]}); // Fetch with relations
+  // async getAll(): Promise<User[]> {
+  //   return await this.userRepository.find({relations:["roles"]}); // Fetch with relations
+  // }
+
+  async findAll(query: QueryDto): Promise<any> {
+    const where: FindOptionsWhere<User> = {
+      isActive: true // Default to isActive = true
+    };
+    const { phone, isActive, page = 1, limit = 10 } = query;
+
+    if (phone) {
+      where.phone = phone;
+    }
+
+    if (isActive !== undefined) {
+      where.isActive = isActive;
+    }
+
+    const [data, total] = await this.userRepository.findAndCount({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        creationDate: 'DESC',
+      },
+    });
+
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+      total,
+      totalPage,
+      page,
+      limit,
+      data: instanceToPlain(data),
+    };
   }
 
   async getOne(id: number): Promise<User> {
@@ -56,9 +91,11 @@ export class UserService {
 
   
 
+  
   async delete(id: number): Promise<void> {
     const user = await this.getOne(id); // Reuse getOne for validation
-    await this.userRepository.remove(user);
+        user.isActive = false;
+        await this.userRepository.save(user); // Soft delete by setting isActive to false
   }
 
 
