@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DataSource } from 'typeorm';
+import { config } from 'dotenv';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  config();
   // app.setGlobalPrefix('api');
   const dataSource = app.get(DataSource);
   try {

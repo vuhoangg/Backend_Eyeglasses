@@ -90,17 +90,10 @@ export class AdminsService {
     if (!admin) {
       throw new NotFoundException('Admin không tồn tại');
     }
-
-
-
-      // Cập nhật các thuộc tính của admin từ updateAdminDto
       admin.name = updateAdminDto.name !== undefined ? updateAdminDto.name : admin.name;
       admin.email = updateAdminDto.email !== undefined ? updateAdminDto.email : admin.email;
       admin.phone = updateAdminDto.phone !== undefined ? updateAdminDto.phone : admin.phone; // Sửa thành phone
-  
-      // Lưu các thay đổi vào database
       const updatedAdmin = await this.adminRepository.save(admin);
-  
       return instanceToPlain(updatedAdmin);;
   }
 
