@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { instanceToPlain } from 'class-transformer';
 import { QueryDto } from './dto/query.dto';
+import { Role } from 'src/roles/entities/role.entity';
 
 @Injectable()
 export class UserService {
@@ -14,22 +15,45 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Role) // Inject Role repository
+    private readonly roleRepository: Repository<Role>,
   ) {}
 
 
 
+  // async create(createUserDto: CreateUserDto): Promise<User> {
+  //   const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+  //   const user = this.userRepository.create({
+  //     ...createUserDto,
+  //     password: hashedPassword,
+  //   });
+  //   return await this.userRepository.save(user);
+  // }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const { roles, ...userDetails } = createUserDto; // Separate roles from user details
+    const hashedPassword = await bcrypt.hash(userDetails.password, 10);
     const user = this.userRepository.create({
-      ...createUserDto,
+      ...userDetails,
       password: hashedPassword,
+      roles: [], // Initialize roles array
     });
+
+    if (roles && roles.length > 0) {
+      // Find roles by IDs
+      const foundRoles = await this.roleRepository.findByIds(roles);
+      user.roles = foundRoles; // Assign roles to the user
+    }
+
     return await this.userRepository.save(user);
   }
 
-  // async getAll(): Promise<User[]> {
-  //   return await this.userRepository.find({relations:["roles"]}); // Fetch with relations
-  // }
+
+
+  
+  
+
+  
 
   async findAll(query: QueryDto): Promise<any> {
     const where: FindOptionsWhere<User> = {
@@ -52,6 +76,7 @@ export class UserService {
       order: {
         creationDate: 'DESC',
       },
+      relations: ["roles"], // Load relations here
     });
 
     const totalPage = Math.ceil(total / limit);

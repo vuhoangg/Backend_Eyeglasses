@@ -10,7 +10,6 @@ import { BrandModule } from './brand/brand.module';
 import { ProductImageModule } from './product_image/product_image.module';
 import { ReviewModule } from './review/review.module';
 import { UserModule } from './user/user.module';
-import { UserRolesModule } from './user_roles/user_roles.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { User } from './user/entities/user.entity';
@@ -20,6 +19,11 @@ import { Permission } from './permissions/entities/permission.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { FilesModule } from './files/files.module';
+import { Category } from './category/entities/category.entity';
+import { Brand } from './brand/entities/brand.entity';
+import { ProductImage } from './product_image/entities/product_image.entity';
+// import { OrderItemsModule } from './order_items/order_items.module';
+// import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -30,7 +34,7 @@ import { FilesModule } from './files/files.module';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission ],
+      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage ],
       synchronize: true,
       logging: true,
     }),
@@ -46,11 +50,13 @@ import { FilesModule } from './files/files.module';
     ProductImageModule,
     ReviewModule,
     UserModule,
-    UserRolesModule,
     RolesModule,
     PermissionsModule,
     AuthModule,
     FilesModule,
+    // OrderItemsModule,
+    // OrdersModule,
+  
   ],
   controllers: [AppController],
   providers: [AppService],

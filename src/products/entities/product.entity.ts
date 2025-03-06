@@ -8,10 +8,11 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
   } from 'typeorm';
-//   import { Category } from 'src/categories/entities/category.entity';
-//   import { Brand } from 'src/brands/entities/brand.entity';
-//   import { ProductImage } from 'src/product_images/entities/product_image.entity';
-//   import { Review } from 'src/reviews/entities/review.entity';
+ 
+// import { OrderItem } from 'src/order_items/entities/order_item.entity';
+import { Category } from 'src/category/entities/category.entity';
+import { Brand } from 'src/brand/entities/brand.entity';
+import { ProductImage } from 'src/product_image/entities/product_image.entity';
   
   @Entity('products') // Matches the table name in SQL
   export class Product {
@@ -30,47 +31,38 @@ import {
     @Column({ default: 0 })
     stock_quantity: number;
   
-    // @Column()
-    // category_id: number;
+    @Column()
+    category_id: number;
   
-    // @ManyToOne(() => Category, (category) => category.products, {
-    //   onDelete: 'RESTRICT',
-    //   onUpdate: 'CASCADE',
-    // })
-    // @JoinColumn({ name: 'category_id' })
-    // category: Category;
+    @ManyToOne(() => Category, (category) => category.products, {
+      onDelete: 'RESTRICT',
+      onUpdate: 'CASCADE',
+    })
+    @JoinColumn({ name: 'category_id' })
+    category: Category;
   
-    // @Column()
-    // brand_id: number;
+    @Column()
+    brand_id: number;
   
-    // @ManyToOne(() => Brand, (brand) => brand.products, {
-    //   onDelete: 'RESTRICT',
-    //   onUpdate: 'CASCADE',
-    // })
-    // @JoinColumn({ name: 'brand_id' })
-    // brand: Brand;
+    @ManyToOne(() => Brand, (brand) => brand.products, {
+      onDelete: 'RESTRICT',
+      onUpdate: 'CASCADE',
+    })
+    @JoinColumn({ name: 'brand_id' })
+    brand: Brand;
   
     @Column({ nullable: true })
-    image: string;
-  
-    @Column({ length: 100, nullable: true })
-    shape: string;
-  
-    @Column({ length: 100, nullable: true })
-    material: string;
-  
-    @Column({ length: 50, nullable: true })
-    color: string;
-  
-    // @OneToMany(() => ProductImage, (productImage) => productImage.product)
-    // productImages: ProductImage[];
-  
-    //  @OneToMany(() => Review, (review) => review.product)
-    // reviews: Review[];
+    sku: string;
+
+    @OneToMany(() => ProductImage, (productImage) => productImage.product)
+    productImages: ProductImage[];
+
+    // @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+    // orderItems: OrderItem[];
   
     @CreateDateColumn()
-    created_at: Date;
+    creationDate: Date;
   
     @UpdateDateColumn()
-    updated_at: Date;
+    modifiedDate: Date;
   }

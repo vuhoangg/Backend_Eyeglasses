@@ -1,4 +1,5 @@
-import { IsString, IsEmail, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsEmail, IsNotEmpty, IsOptional, MinLength, IsArray } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -30,4 +31,9 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsArray() // Add validation for roles
+  @Type(() => Number)
+  roles?: number[]; // Array of role IDs
 }
