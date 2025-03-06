@@ -14,7 +14,7 @@ import { User } from 'src/user/entities/user.entity';
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ unique: true })
+    @Column({ unique: true , nullable: false})
     name: string;
   
     @Column({ nullable: true })
@@ -26,6 +26,9 @@ import { User } from 'src/user/entities/user.entity';
     @ManyToMany(() => Role, (role) => role.users)
     @JoinTable()
     roles: Role[];
+
+    @Column({ default: true }) // Add isActive field
+  isActive: boolean;
   
     @ManyToMany(() => Permission, (permission) => permission.roles)
     @JoinTable({

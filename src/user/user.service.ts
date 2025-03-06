@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { instanceToPlain } from 'class-transformer';
 import { QueryDto } from './dto/query.dto';
 import { Role } from 'src/roles/entities/role.entity';
-
+import { In } from 'typeorm';
 @Injectable()
 export class UserService {
   
@@ -19,16 +19,6 @@ export class UserService {
     private readonly roleRepository: Repository<Role>,
   ) {}
 
-
-
-  // async create(createUserDto: CreateUserDto): Promise<User> {
-  //   const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-  //   const user = this.userRepository.create({
-  //     ...createUserDto,
-  //     password: hashedPassword,
-  //   });
-  //   return await this.userRepository.save(user);
-  // }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { roles, ...userDetails } = createUserDto; // Separate roles from user details
@@ -101,19 +91,40 @@ export class UserService {
 
 
 
-  async update(id: number, updateAdminDto: UpdateUserDto): Promise<any> {
-    const user = await this.userRepository.findOneBy({ id });
+
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
+    const user = await this.userRepository.findOne({
+        where: { id },
+        relations: ['roles'], // Nạp sẵn danh sách roles
+    });
 
     if (!user) {
-      throw new NotFoundException('Admin không tồn tại');
+        throw new NotFoundException('User không tồn tại');
     }
-      user.username = updateAdminDto.username !== undefined ? updateAdminDto.username : user.username;
-      user.email = updateAdminDto.email !== undefined ? updateAdminDto.email : user.email;
-      user.phone = updateAdminDto.phone !== undefined ? updateAdminDto.phone : user.phone; // Sửa thành phone
-      const updatedAdmin = await this.userRepository.save(user);
-      return instanceToPlain(updatedAdmin);;
-  }
 
+    // Cập nhật các trường cơ bản
+    user.username = updateUserDto.username ?? user.username;
+    user.email = updateUserDto.email ?? user.email;
+    user.phone = updateUserDto.phone ?? user.phone;
+    user.address = updateUserDto.address ?? user.address;
+
+    // Nếu có danh sách roleIds cần cập nhật
+    if (updateUserDto.roles && Array.isArray(updateUserDto.roles) && updateUserDto.roles.length > 0) {
+        const roles = await this.roleRepository.find({
+            where: { id: In(updateUserDto.roles) },
+        });
+
+        if (roles.length !== updateUserDto.roles.length) {
+            throw new NotFoundException('Một hoặc nhiều vai trò không hợp lệ');
+        }
+
+        user.roles = roles;
+    }
+
+    const updatedAdmin = await this.userRepository.save(user);
+    return instanceToPlain(updatedAdmin);
+}
   
 
   

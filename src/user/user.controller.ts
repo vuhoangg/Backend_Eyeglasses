@@ -64,10 +64,10 @@ export class UserController {
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateAdminDto: UpdateUserDto,
+    @Body() updateuserDto: UpdateUserDto,
   ) {
     try {
-      const admin = await this.userService.update(id, updateAdminDto);
+      const admin = await this.userService.update(id, updateuserDto);
 
       return {
         statusCode: HttpStatus.OK,

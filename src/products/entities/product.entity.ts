@@ -27,6 +27,9 @@ import { ProductImage } from 'src/product_image/entities/product_image.entity';
   
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     price: number;
+
+    @Column({ default: true }) // Add isActive field
+    isActive: boolean;
   
     @Column({ default: 0 })
     stock_quantity: number;
