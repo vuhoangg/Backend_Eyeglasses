@@ -21,8 +21,8 @@ import {
     @Column({ type: 'text', nullable: true })
     description: string;
   
-    @Column({ nullable: true })
-    parent_category_id: number;
+    // @Column({ nullable: true })
+    // parent_category_id: number;
   
     @ManyToOne(() => Category, (category) => category.children, {
       onDelete: 'SET NULL',

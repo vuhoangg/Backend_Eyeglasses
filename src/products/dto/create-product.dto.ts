@@ -1,5 +1,6 @@
 // create-product.dto.ts
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -31,4 +32,6 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   sku?: string;
+
+
 }

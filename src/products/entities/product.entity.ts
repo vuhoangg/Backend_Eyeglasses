@@ -38,6 +38,7 @@ import { ProductImage } from 'src/product_image/entities/product_image.entity';
     category_id: number;
   
     @ManyToOne(() => Category, (category) => category.products, {
+      nullable: true,
       onDelete: 'RESTRICT',
       onUpdate: 'CASCADE',
     })
@@ -48,6 +49,7 @@ import { ProductImage } from 'src/product_image/entities/product_image.entity';
     brand_id: number;
   
     @ManyToOne(() => Brand, (brand) => brand.products, {
+      nullable: true,
       onDelete: 'RESTRICT',
       onUpdate: 'CASCADE',
     })
