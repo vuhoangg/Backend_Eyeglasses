@@ -82,13 +82,8 @@ export class RolesService {
     if (!role) {
         throw new NotFoundException('Roles không tồn tại');
     }
-
-    // Cập nhật các trường cơ bản
     role.name = updateRoleDto.name?? role.name;
     role.description = updateRoleDto.description ?? role.description;
-
-
-    // Nếu có danh sách roleIds cần cập nhật
     if (updateRoleDto.permissions && Array.isArray(updateRoleDto.permissions) && updateRoleDto.permissions.length > 0) {
         const permissions = await this.permissionRepository.find({
             where: { id: In(updateRoleDto.permissions) },
