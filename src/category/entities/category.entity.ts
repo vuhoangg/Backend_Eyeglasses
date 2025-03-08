@@ -23,6 +23,8 @@ import {
   
     // @Column({ nullable: true })
     // parent_category_id: number;
+    @Column({ default: true }) // Add isActive field
+    isActive: boolean;
   
     @ManyToOne(() => Category, (category) => category.children, {
       onDelete: 'SET NULL',

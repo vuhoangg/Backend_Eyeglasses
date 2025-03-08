@@ -84,11 +84,13 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id', ParseIntPipe) id: number) {
     try {
       await this.productService.delete(id);
-      return;
+      return{
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'Product deleted successfully',
+      };
     } catch (error) {
       throw new NotFoundException(error.message);
     }

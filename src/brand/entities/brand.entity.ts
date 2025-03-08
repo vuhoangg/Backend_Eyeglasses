@@ -21,9 +21,13 @@ import {
   
     @Column({ nullable: true })
     logo: string;
+
+    @Column({ default: true }) // Add isActive field
+    isActive: boolean;
   
     @OneToMany(() => Product, (product) => product.brand)
     products: Product[];
+
   
     @CreateDateColumn()
     creationDate: Date;

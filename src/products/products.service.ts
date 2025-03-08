@@ -90,22 +90,7 @@ export class ProductService {
 
  
 
-  // async update(id: number, updateProductDto: UpdateProductDto): Promise<any> {
-  //      const {  ...productDetails } = updateProductDto; // Separate category_id and brand_id
-  //   const product = await this.productRepository.findOne({
-  //       where: { id },
-  //       relations: ['category', 'brand'],
-  //   });
-
-  //   if (!product) {
-  //       throw new NotFoundException('product không tồn tại');
-  //   }
-
-  //   // Cập nhật các trường cơ bản
-  //   product.name = updateProductDto.name?? product.name;
-  //   product.description = updateProductDto.description ?? product.description;
-
-  // }
+  
 
   async update(id: number, updateProductDto: UpdateProductDto): Promise<any> {
     const { ...productDetails } = updateProductDto;
