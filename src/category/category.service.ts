@@ -1,30 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
 import { QueryDto } from './dto/query.dto';
 
 @Injectable()
 export class CategoryService {
   constructor(
-  
-    @InjectRepository(Category) // Inject Category repository
+    @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
-
   ) {}
-
-  // async create(createCategoryDto: CreateCategoryDto): Promise<any> {
-  //   const {  ...CategoryDetails } = createCategoryDto; // Separate category_id and Category_id
-     
-  //   const Category = this.categoryRepository.create({
-  //     ...CategoryDetails,
-  //   });
-  //   const newCategory = await this.categoryRepository.save(Category);
-  //   return instanceToPlain(newCategory);
-  // }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<any> {
     const { parentCategoryId, ...categoryDetails } = createCategoryDto;
@@ -44,77 +32,56 @@ export class CategoryService {
   }
 
   async findAll(query: QueryDto): Promise<any> {
-    const where: FindOptionsWhere<Category> = {
-      isActive: true, // Default to only active Categorys
-    };
-    const { name, isActive, page = 1, limit = 10 } = query;
-    if (name) {
-      where.name = name;
-    }
-    if (isActive !== undefined) {
-      where.isActive = isActive;
-    }
+    const where: FindOptionsWhere<Category> = { isActive: true };
+
+    if (query.name) where.name = query.name;
+    if (query.isActive !== undefined) where.isActive = query.isActive;
+
     const [data, total] = await this.categoryRepository.findAndCount({
       where,
-      skip: (page - 1) * limit,
-      take: limit,
-      order: {
-        creationDate: 'DESC',
-      },
       relations: ['parent', 'children'], // Load danh mục cha & con
+      order: { creationDate: 'DESC' },
     });
 
-    const totalPage = Math.ceil(total / limit);
-
-    return {
-      total,
-      totalPage,
-      page,
-      limit,
-      data: instanceToPlain(data),
-    };
+    return { total, data: instanceToPlain(data) };
   }
 
   async findOne(id: number): Promise<any> {
-    const Category = await this.categoryRepository.findOne({
-      where: { id, isActive: true }, // Only fetch active Categorys
-      relations: ['parent', 'children'], // Load danh mục cha & con
+    const category = await this.categoryRepository.findOne({
+      where: { id, isActive: true },
+      relations: ['parent', 'children'], // Lấy danh mục cha & con nếu có
     });
 
-    if (!Category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+    if (!category) {
+      throw new NotFoundException(`Danh mục với ID ${id} không tồn tại`);
     }
 
-    return instanceToPlain(Category);
+    return instanceToPlain(category);
   }
 
- 
-
-  
-
   async update(id: number, updateCategoryDto: UpdateCategoryDto): Promise<any> {
-    const { ...CategoryDetails } = updateCategoryDto;
+    const { parentCategoryId, ...categoryDetails } = updateCategoryDto;
 
-    const Category = await this.categoryRepository.findOne({
-      where: { id },
-    });
+    const category = await this.categoryRepository.findOne({ where: { id } });
+    if (!category) throw new NotFoundException('Danh mục không tồn tại');
 
-    if (!Category) {
-      throw new NotFoundException('Category không tồn tại');
+    Object.assign(category, categoryDetails);
+
+    if (parentCategoryId) {
+      const parentCategory = await this.categoryRepository.findOne({ where: { id: parentCategoryId } });
+      if (!parentCategory) throw new NotFoundException('Danh mục cha không tồn tại');
+      category.parent = parentCategory;
     }
-    // Update Category 
-    Object.assign(Category, CategoryDetails);
-    const updatedCategory = await this.categoryRepository.save(Category);
+
+    const updatedCategory = await this.categoryRepository.save(category);
     return instanceToPlain(updatedCategory);
   }
 
   async softDelete(id: number): Promise<void> {
-    const Category = await this.categoryRepository.findOne({where:{id}});
-    if (!Category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
-    }
-    Category.isActive = false;
-    await this.categoryRepository.save(Category);
+    const category = await this.categoryRepository.findOne({ where: { id } });
+    if (!category) throw new NotFoundException('Danh mục không tồn tại');
+
+    category.isActive = false;
+    await this.categoryRepository.save(category);
   }
 }
-
