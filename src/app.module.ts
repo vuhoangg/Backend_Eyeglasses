@@ -22,6 +22,7 @@ import { FilesModule } from './files/files.module';
 import { Category } from './category/entities/category.entity';
 import { Brand } from './brand/entities/brand.entity';
 import { ProductImage } from './product_image/entities/product_image.entity';
+import { Review } from './review/entities/review.entity';
 // import { OrderItemsModule } from './order_items/order_items.module';
 // import { OrdersModule } from './orders/orders.module';
 
@@ -34,7 +35,7 @@ import { ProductImage } from './product_image/entities/product_image.entity';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage ],
+      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review ],
       synchronize: true,
       logging: true,
     }),

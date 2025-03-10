@@ -13,6 +13,7 @@ import {
 import { Category } from 'src/category/entities/category.entity';
 import { Brand } from 'src/brand/entities/brand.entity';
 import { ProductImage } from 'src/product_image/entities/product_image.entity';
+import { Review } from 'src/review/entities/review.entity';
   
   @Entity('products') // Matches the table name in SQL
   export class Product {
@@ -33,6 +34,9 @@ import { ProductImage } from 'src/product_image/entities/product_image.entity';
   
     @Column({ default: 0 })
     stock_quantity: number;
+
+    @OneToMany(() => Review, (review) => review.product)
+    reviews: Review[];
   
     @Column()
     category_id: number;

@@ -7,8 +7,10 @@ import {
     ManyToMany,
     JoinTable,
     DeleteDateColumn,
+    OneToMany,
   } from 'typeorm';
   import { Role } from 'src/roles/entities/role.entity';
+import { Review } from 'src/review/entities/review.entity';
   
   @Entity('users')
   export class User {
@@ -46,6 +48,10 @@ import {
     modifiedDate: Date;
 
     deletedAt?: Date;
+
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
 
   
     @ManyToMany(() => Role, (role) => role.users)
