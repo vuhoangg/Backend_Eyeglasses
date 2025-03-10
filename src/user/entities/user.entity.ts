@@ -11,6 +11,7 @@ import {
   } from 'typeorm';
   import { Role } from 'src/roles/entities/role.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { Cart } from 'src/carts/entities/cart.entity';
   
   @Entity('users')
   export class User {
@@ -52,6 +53,9 @@ import { Review } from 'src/review/entities/review.entity';
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
+
+  @OneToMany(() => Cart, (cart) => cart.user)
+  carts: Cart[];
 
   
     @ManyToMany(() => Role, (role) => role.users)

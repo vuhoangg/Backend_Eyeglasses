@@ -25,6 +25,12 @@ import { ProductImage } from './product_image/entities/product_image.entity';
 import { Review } from './review/entities/review.entity';
 // import { OrderItemsModule } from './order_items/order_items.module';
 // import { OrdersModule } from './orders/orders.module';
+import { CartsModule } from './carts/carts.module';
+import { CartItemsModule } from './cart-items/cart-items.module';
+import { Cart } from './carts/entities/cart.entity';
+import { CartItem } from './cart-items/entities/cart-item.entity';
+
+
 
 @Module({
   imports: [
@@ -35,7 +41,7 @@ import { Review } from './review/entities/review.entity';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review ],
+      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, Cart, CartItem  ],
       synchronize: true,
       logging: true,
     }),
@@ -55,6 +61,8 @@ import { Review } from './review/entities/review.entity';
     PermissionsModule,
     AuthModule,
     FilesModule,
+    CartsModule,
+    CartItemsModule,
     // OrderItemsModule,
     // OrdersModule,
   
