@@ -29,6 +29,14 @@ import { CartsModule } from './carts/carts.module';
 import { CartItemsModule } from './cart-items/cart-items.module';
 import { Cart } from './carts/entities/cart.entity';
 import { CartItem } from './cart-items/entities/cart-item.entity';
+import { OrderStatusModule } from './order-status/order-status.module';
+import { PromotionsModule } from './promotions/promotions.module';
+import { OrderItemsModule } from './order_items/order_items.module';
+import { OrdersModule } from './orders/orders.module';
+import { Promotion } from './promotions/entities/promotion.entity';
+import { OrderStatus } from './order-status/entities/order-status.entity';
+import { OrderItem } from './order_items/entities/order_item.entity';
+import { Order } from './orders/entities/order.entity';
 
 
 
@@ -41,7 +49,7 @@ import { CartItem } from './cart-items/entities/cart-item.entity';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, Cart, CartItem  ],
+      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, Cart, CartItem, Order, OrderItem, OrderStatus, Promotion ],
       synchronize: true,
       logging: true,
     }),
@@ -63,8 +71,10 @@ import { CartItem } from './cart-items/entities/cart-item.entity';
     FilesModule,
     CartsModule,
     CartItemsModule,
-    // OrderItemsModule,
-    // OrdersModule,
+    OrderStatusModule,
+    PromotionsModule,
+    OrderItemsModule,
+    OrdersModule,
   
   ],
   controllers: [AppController],

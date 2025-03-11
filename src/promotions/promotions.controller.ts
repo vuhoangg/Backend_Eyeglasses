@@ -12,29 +12,27 @@ import {
   HttpStatus,
   Patch,
 } from '@nestjs/common';
-import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { PromotionsService } from './promotions.service';
+import { CreatePromotionDto } from './dto/create-promotion.dto';
+import { UpdatePromotionDto } from './dto/update-promotion.dto';
 
 interface QueryDto {
-  user_id?: number;
-  order_status_id?: number;
   page?: number;
   limit?: number;
 }
 
-@Controller('orders')
-export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+@Controller('promotions')
+export class PromotionsController {
+  constructor(private readonly promotionsService: PromotionsService) {}
 
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) {
+  async create(@Body() createPromotionDto: CreatePromotionDto) {
       try {
-          const order = await this.ordersService.create(createOrderDto);
+          const promotion = await this.promotionsService.create(createPromotionDto);
           return {
               statusCode: HttpStatus.CREATED,
-              message: 'Order created successfully',
-              data: order,
+              message: 'Promotion created successfully',
+              data: promotion,
           };
       } catch (error) {
           throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -44,11 +42,11 @@ export class OrdersController {
   @Get()
   async findAll(@Query() query: QueryDto) {
       try {
-          const orders = await this.ordersService.findAll(query);
+          const promotions = await this.promotionsService.findAll(query);
           return {
               statusCode: HttpStatus.OK,
-              message: 'Orders fetched successfully',
-              data: orders,
+              message: 'Promotions fetched successfully',
+              data: promotions,
           };
       } catch (error) {
           throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -58,11 +56,11 @@ export class OrdersController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
       try {
-          const order = await this.ordersService.findOne(id);
+          const promotion = await this.promotionsService.findOne(id);
           return {
               statusCode: HttpStatus.OK,
-              message: 'Order fetched successfully',
-              data: order,
+              message: 'Promotion fetched successfully',
+              data: promotion,
           };
       } catch (error) {
           if (error instanceof NotFoundException) {
@@ -75,14 +73,14 @@ export class OrdersController {
   @Patch(':id')
   async update(
       @Param('id', ParseIntPipe) id: number,
-      @Body() updateOrderDto: UpdateOrderDto,
+      @Body() updatePromotionDto: UpdatePromotionDto,
   ) {
       try {
-          const order = await this.ordersService.update(id, updateOrderDto);
+          const promotion = await this.promotionsService.update(id, updatePromotionDto);
           return {
               statusCode: HttpStatus.OK,
-              message: 'Order updated successfully',
-              data: order,
+              message: 'Promotion updated successfully',
+              data: promotion,
           };
       } catch (error) {
           if (error instanceof NotFoundException) {
@@ -95,10 +93,10 @@ export class OrdersController {
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
       try {
-          await this.ordersService.delete(id);
+          await this.promotionsService.delete(id);
           return {
               statusCode: HttpStatus.OK,
-              message: 'Order deleted successfully',
+              message: 'Promotion deleted successfully',
           };
       } catch (error) {
           if (error instanceof NotFoundException) {
