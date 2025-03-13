@@ -33,7 +33,7 @@ export class Order {
     @JoinColumn({ name: 'order_status_id' })
     orderStatus: OrderStatus;
 
-    @Column({ length: 50, nullable: true })
+    @Column({ length: 50, nullable: true }) 
     paymentMethod: string;
 
     @ManyToOne(() => Promotion, { nullable: true }) // Allow null value

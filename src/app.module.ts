@@ -23,8 +23,6 @@ import { Category } from './category/entities/category.entity';
 import { Brand } from './brand/entities/brand.entity';
 import { ProductImage } from './product_image/entities/product_image.entity';
 import { Review } from './review/entities/review.entity';
-// import { OrderItemsModule } from './order_items/order_items.module';
-// import { OrdersModule } from './orders/orders.module';
 import { CartsModule } from './carts/carts.module';
 import { CartItemsModule } from './cart-items/cart-items.module';
 import { Cart } from './carts/entities/cart.entity';
@@ -37,6 +35,10 @@ import { Promotion } from './promotions/entities/promotion.entity';
 import { OrderStatus } from './order-status/entities/order-status.entity';
 import { OrderItem } from './order_items/entities/order_item.entity';
 import { Order } from './orders/entities/order.entity';
+import { PaymentModule } from './payment/payment.module';
+import { Payment } from './payment/entities/payment.entity';
+import { PaymentStatusModule } from './payment-status/payment-status.module';
+import { PaymentStatus } from './payment-status/entities/payment-status.entity';
 
 
 
@@ -49,7 +51,7 @@ import { Order } from './orders/entities/order.entity';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, Cart, CartItem, Order, OrderItem, OrderStatus, Promotion ],
+      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, Cart, CartItem, Order, OrderItem, OrderStatus, Promotion, Payment ,PaymentStatus ],
       synchronize: true,
       logging: true,
     }),
@@ -75,6 +77,8 @@ import { Order } from './orders/entities/order.entity';
     PromotionsModule,
     OrderItemsModule,
     OrdersModule,
+    PaymentModule,
+    PaymentStatusModule,
   
   ],
   controllers: [AppController],

@@ -37,7 +37,7 @@ export class ProductController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+ 
   @Get()
   async findAll(@Query() query: QueryDto) {
     try {
