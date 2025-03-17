@@ -49,10 +49,10 @@ export class UserService {
     const where: FindOptionsWhere<User> = {
       isActive: true // Default to isActive = true
     };
-    const { phone, isActive, page = 1, limit = 10 } = query;
+    const { username , isActive, page = 1, limit = 10 } = query;
 
-    if (phone) {
-      where.phone = phone;
+    if(username) {
+      where.username = username;
     }
 
     if (isActive !== undefined) {
@@ -81,7 +81,7 @@ export class UserService {
   }
 
   async getOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id }, relations: ["roles"] }); // Fetch with relations
+    const user = await this.userRepository.findOne({ where: { id ,isActive: true  }, relations: ["roles"] }); // Fetch with relations
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -96,42 +96,57 @@ export class UserService {
   async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
     const user = await this.userRepository.findOne({
         where: { id },
-        relations: ['roles'], // Nạp sẵn danh sách roles
+        relations: ['roles'], // Eagerly load roles
     });
 
     if (!user) {
-        throw new NotFoundException('User không tồn tại');
+        throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    // Cập nhật các trường cơ bản
-    user.username = updateUserDto.username ?? user.username;
-    user.email = updateUserDto.email ?? user.email;
-    user.phone = updateUserDto.phone ?? user.phone;
-    user.address = updateUserDto.address ?? user.address;
+    // Destructure roles from the update DTO.  Other props are assigned using Object.assign.
+    const { roles, ...userDetails } = updateUserDto;
 
-    // Nếu có danh sách roleIds cần cập nhật
-    if (updateUserDto.roles && Array.isArray(updateUserDto.roles) && updateUserDto.roles.length > 0) {
-        const roles = await this.roleRepository.find({
-            where: { id: In(updateUserDto.roles) },
-        });
+    // Assign basic properties directly
+    Object.assign(user, userDetails);
 
-        if (roles.length !== updateUserDto.roles.length) {
-            throw new NotFoundException('Một hoặc nhiều vai trò không hợp lệ');
+    // Handle password update (hash it)
+    if (updateUserDto.password) {
+        user.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    // Handle roles update
+    if (roles !== undefined) { // Check if roles is provided in the DTO
+        if (Array.isArray(roles) && roles.length > 0) {
+            const foundRoles = await this.roleRepository.find({
+                where: { id: In(roles) },
+            });
+
+            if (foundRoles.length !== roles.length) {
+                throw new NotFoundException('One or more roles not found');
+            }
+
+            user.roles = foundRoles; // Replace existing roles with the new ones
+        } else {
+            // If roles is an empty array, remove all roles from the user
+            user.roles = [];
         }
-
-        user.roles = roles;
     }
 
-    const updatedAdmin = await this.userRepository.save(user);
-    return instanceToPlain(updatedAdmin);
+    const updatedUser = await this.userRepository.save(user);
+    return instanceToPlain(updatedUser);
 }
   
 
   
+
+
   async delete(id: number): Promise<void> {
-    const user = await this.getOne(id); // Reuse getOne for validation
-        user.isActive = false;
-        await this.userRepository.save(user); // Soft delete by setting isActive to false
+    const user = await this.userRepository.findOne({where:{id}});
+    if (!user) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+   user.isActive = false;
+    await this.userRepository.save(user);
   }
 
 

@@ -24,7 +24,7 @@ import { QueryDto } from './dto/query.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
@@ -83,11 +83,19 @@ export class UserController {
     }
   }
 
+
+
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // Returns 204 No Content
   async delete(@Param('id', ParseIntPipe) id: number) {
-    await this.userService.delete(id);
-    return; // No content on successful delete
+    try {
+      await this.userService.delete(id);
+      return{
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'Product deleted successfully',
+      };
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
  
 }

@@ -1,9 +1,9 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
+import { IsOptional } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-    username?: string;
-    email?: string;
-    phone?: string;
-    roleIds?: number[]; // Thêm danh sách ID của Role
+    
+    @IsOptional()
+    isActive?: boolean;
 }

@@ -11,6 +11,14 @@ async function bootstrap() {
   config();
   app.useStaticAssets(join(__dirname, '..', 'public')); // Serve static files from the 'public' directory
   // app.setGlobalPrefix('api');
+
+   // Bật CORS
+   app.enableCors({
+    origin: 'http://localhost:3009', // Chỉ cho phép React frontend truy cập
+    methods: 'GET,POST,PUT,PATCH,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true, // Nếu cần gửi cookie hoặc token
+  });
   const dataSource = app.get(DataSource);
   try {
     await dataSource.query('SELECT 1'); // Kiểm tra kết nối
