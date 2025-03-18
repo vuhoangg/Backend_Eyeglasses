@@ -29,6 +29,8 @@ export class CreateProductDto {
   @IsNumber()
   brand_id: number;
 
+  imageProduct?: string;
+
   @IsOptional()
   @IsString()
   sku?: string;

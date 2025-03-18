@@ -40,6 +40,10 @@ import { Review } from 'src/review/entities/review.entity';
   
     @Column()
     category_id: number;
+
+    @Column({ nullable: true })
+    imageProduct?: string;
+
   
     @ManyToOne(() => Category, (category) => category.products, {
       nullable: true,

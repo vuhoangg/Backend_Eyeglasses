@@ -10,7 +10,7 @@ export class FilesController {
 
   @Post('upload')
   @UseInterceptors(
-    FileInterceptor('fileupload'))
+    FileInterceptor('fileUpload'))
     uploadFile(@UploadedFile(
     new ParseFilePipeBuilder()
     .addFileTypeValidator({
@@ -27,6 +27,7 @@ export class FilesController {
     return{
       statusCode: HttpStatus.OK,
       message: 'upload successfully',
+      fileName: file.filename
   
     }
   }

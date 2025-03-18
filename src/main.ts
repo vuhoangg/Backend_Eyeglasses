@@ -16,7 +16,7 @@ async function bootstrap() {
    app.enableCors({
     origin: 'http://localhost:3009', // Chỉ cho phép React frontend truy cập
     methods: 'GET,POST,PUT,PATCH,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
+    allowedHeaders: 'Content-Type, Authorization, folder_type',
     credentials: true, // Nếu cần gửi cookie hoặc token
   });
   const dataSource = app.get(DataSource);

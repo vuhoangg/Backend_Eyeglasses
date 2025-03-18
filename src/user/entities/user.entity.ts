@@ -38,6 +38,10 @@ import { Cart } from 'src/carts/entities/cart.entity';
   
     @Column({ nullable: true })
     address?: string;
+
+    @Column({ nullable: true })
+    avartar?: string;
+  
   
     @Column({ default: true })
     isActive: boolean;

@@ -9,6 +9,7 @@ import { instanceToPlain } from 'class-transformer';
 import { QueryDto } from './dto/query.dto';
 import { Role } from 'src/roles/entities/role.entity';
 import { In } from 'typeorm';
+import { ILike } from 'typeorm';
 @Injectable()
 export class UserService {
   
@@ -51,9 +52,9 @@ export class UserService {
     };
     const { username , isActive, page = 1, limit = 10 } = query;
 
-    if(username) {
-      where.username = username;
-    }
+    if (username) {
+      where.username = ILike(`%${username}%`); // Tìm kiếm gần đúng
+  }
 
     if (isActive !== undefined) {
       where.isActive = isActive;

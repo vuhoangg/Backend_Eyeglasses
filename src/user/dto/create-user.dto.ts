@@ -32,6 +32,8 @@ export class CreateUserDto {
   @IsString()
   address?: string;
 
+  avartar?: string;
+
   // @IsOptional()
   // @IsArray() // Add validation for roles
   // @Type(() => Number)
