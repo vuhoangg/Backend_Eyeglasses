@@ -8,6 +8,7 @@ import { instanceToPlain } from 'class-transformer';
 import { QueryDto } from './dto/query.dto';
 import { Category } from 'src/category/entities/category.entity';
 import { Brand } from 'src/brand/entities/brand.entity';
+import { ILike } from 'typeorm';
 
 @Injectable()
 export class ProductService {
@@ -39,7 +40,7 @@ export class ProductService {
     const { name, category_id, brand_id, isActive, page = 1, limit = 10 } = query;
 
     if (name) {
-      where.name = name;
+      where.name = ILike(`%${name}%`);
     }
 
     if (category_id) {
