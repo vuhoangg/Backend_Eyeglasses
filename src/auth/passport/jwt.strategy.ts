@@ -16,7 +16,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username };
+    return {
+      userId: payload.sub,
+      username: payload.email, // Thay đổi từ payload.username thành payload.email nếu bạn sử dụng email làm username
+      roles: payload.roles || [], // Thêm roles vào đây, đảm bảo có giá trị mặc định nếu không có roles
+    };
   }
 }
 

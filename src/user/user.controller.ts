@@ -20,7 +20,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { QueryDto } from './dto/query.dto';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 @Controller('user')
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -35,6 +38,7 @@ export class UserController {
     };
   }
 
+  @Roles('admin') // Yêu cầu role "admin" để tạo user
   @Get()
   async findAll(@Query() query: QueryDto) {
     try {

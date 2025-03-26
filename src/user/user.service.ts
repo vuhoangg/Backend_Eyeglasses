@@ -152,10 +152,10 @@ export class UserService {
 
 
 
-  async findOneByUsername(username: string): Promise<User | null> {
+  async findOneByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOne({
       where: {
-        email: username, // Tìm kiếm theo username trong cột email
+        email: email, // Tìm kiếm theo username trong cột email
       },
       relations: ['roles', 'roles.permissions'], // Load quan hệ (nếu cần)
     });
