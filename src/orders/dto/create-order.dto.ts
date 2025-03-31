@@ -21,7 +21,7 @@ export class CreateOrderDto {
   @IsString()
   paymentMethod?: string;
 
-  @IsOptional()
+  @IsOptional() // Cho phép giá trị null hoặc undefined
   @IsNumber()
-  promotion_id?: number;
+  promotion_id?: number | null; // Thay đổi kiểu dữ liệu
 }

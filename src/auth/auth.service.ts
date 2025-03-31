@@ -38,7 +38,8 @@ export class AuthService {
       const payload = {
           username : user.username,
           email: user.email,
-          sub: user.id, // Sử dụng user.id thay vì user.userId
+          phone: user.phone,
+          userId: user.id, // Sử dụng user.id thay vì user.userId
           roles: user.roles.map(role => role.name), // Thêm roles vào payload
       };
 
@@ -49,6 +50,7 @@ export class AuthService {
           status: 'success',
           message: 'Đăng nhập thành công',
           username : payload.username,
+          phone : payload.phone,
           role: payload.roles,
           token: accessToken,
       };
@@ -75,6 +77,9 @@ export class AuthService {
 
     return await this.userRepository.save(user);
   }
+
+
+  
   
 
 

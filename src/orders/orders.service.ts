@@ -42,10 +42,16 @@ export class OrdersService {
     if (!orderStatus) {
       throw new NotFoundException(`OrderStatus with ID ${order_status_id} not found`);
     }
+    
+    // Khởi tạo promotion là null trước
+    let promotion: Promotion | null = null;
 
-    const promotion =  await this.promotionRepository.findOneBy({ id: promotion_id });
-    if (promotion) {
-      throw new NotFoundException(`Promotion with ID ${promotion_id} not found`);
+    // Check nếu promotion_id tồn tại thì mới tìm kiếm promotion
+    if (promotion_id) {
+        promotion = await this.promotionRepository.findOneBy({ id: promotion_id });
+        if (!promotion) {
+            throw new NotFoundException(`Promotion with ID ${promotion_id} not found`);
+        }
     }
 
     const order = this.orderRepository.create({

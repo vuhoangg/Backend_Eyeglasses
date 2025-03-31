@@ -22,8 +22,9 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { QueryDto } from './dto/query.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { ChangePasswordDto } from './dto/change-password.dto';
 @Controller('user')
-@UseGuards(JwtAuthGuard, RolesGuard) 
+// @UseGuards(JwtAuthGuard, RolesGuard) 
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -38,7 +39,7 @@ export class UserController {
     };
   }
 
-  @Roles('admin') // Yêu cầu role "admin" để tạo user
+  // @Roles('admin') // Yêu cầu role "admin" để tạo user
   @Get()
   async findAll(@Query() query: QueryDto) {
     try {
@@ -99,6 +100,25 @@ export class UserController {
       };
     } catch (error) {
       throw new NotFoundException(error.message);
+    }
+  }
+
+  @Patch(':id/password')
+  async changePassword(
+    @Param('id', ParseIntPipe) id: number, // Lấy ID người dùng từ params
+    @Body() changePasswordDto: ChangePasswordDto, // Lấy dữ liệu từ body
+  ): Promise<any> {
+    try {
+      await this.userService.changePassword(id, changePasswordDto);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Thành công',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
  
