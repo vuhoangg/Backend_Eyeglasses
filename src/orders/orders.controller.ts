@@ -59,6 +59,19 @@ export class OrdersController {
           throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
   }
+  @Get('monthly-revenue')
+async getMonthlyRevenue() {
+    try {
+        const revenueData = await this.ordersService.getMonthlyRevenue();
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Monthly revenue fetched successfully',
+            data: revenueData,
+        };
+    } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+}
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
@@ -114,17 +127,5 @@ export class OrdersController {
   }
 
   // orders.controller.ts
-@Get('monthly-revenue')
-async getMonthlyRevenue() {
-    try {
-        const revenueData = await this.ordersService.getMonthlyRevenue();
-        return {
-            statusCode: HttpStatus.OK,
-            message: 'Monthly revenue fetched successfully',
-            data: revenueData,
-        };
-    } catch (error) {
-        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-}
+
 }

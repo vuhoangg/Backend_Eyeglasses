@@ -171,20 +171,20 @@ export class OrdersService {
   }
 
   // orders.service.ts
-async getMonthlyRevenue(): Promise<any[]> {
-  const monthlyRevenue = await this.orderRepository
-      .createQueryBuilder('order')
-      .select("DATE_TRUNC('month', \"creationDate\")", 'month')
-      .addSelect('SUM(order.totalAmount)', 'revenue')
-      .where("DATE_PART('year', \"creationDate\") = DATE_PART('year', CURRENT_DATE)") // Chỉ lấy dữ liệu năm hiện tại
-      .groupBy('month')
-      .orderBy('month', 'ASC')
-      .getRawMany();
-
-  return monthlyRevenue.map(item => ({
-      month: new Date(item.month).toLocaleDateString('en-US', { month: '2-digit' }), // Định dạng tháng
-      revenue: parseFloat(item.revenue), // Chuyển đổi revenue sang số float
-  }));
-}
+  async getMonthlyRevenue(): Promise<any[]> {
+    const monthlyRevenue = await this.orderRepository
+        .createQueryBuilder('order')
+        .select("DATE_FORMAT(creationDate, '%Y-%m-01')", 'month')
+        .addSelect('SUM(order.totalAmount)', 'revenue')
+        .where("YEAR(creationDate) = YEAR(CURDATE())") // Lấy dữ liệu năm hiện tại trong MySQL
+        .groupBy('month')
+        .orderBy('month', 'ASC')
+        .getRawMany();
+  
+    return monthlyRevenue.map(item => ({
+        month: new Date(item.month).toLocaleDateString('en-US', { month: '2-digit' }),
+        revenue: parseFloat(item.revenue || 0), // Thêm xử lý cho trường hợp null
+    }));
+  }
   
 }
