@@ -30,12 +30,12 @@ export class OrdersService {
     private readonly promotionRepository: Repository<Promotion>,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<any> {
-    const { user_id, order_status_id, promotion_id, ...orderData } = createOrderDto;
+  async create(createOrderDto: CreateOrderDto, userId: number): Promise<any> {
+    const { order_status_id, promotion_id, ...orderData } = createOrderDto;
 
-    const user = await this.userRepository.findOneBy({ id: user_id });
+    const user = await this.userRepository.findOneBy({ id: userId  });
     if (!user) {
-      throw new NotFoundException(`User with ID ${user_id} not found`);
+      throw new NotFoundException(`User with ID ${userId } not found`);
     }
 
     const orderStatus = await this.orderStatusRepository.findOneBy({ id: order_status_id });
@@ -56,7 +56,7 @@ export class OrdersService {
 
     const order = this.orderRepository.create({
       ...orderData,
-      user,
+      user: user,  // Gán trực tiếp đối tượng User
       orderStatus,
       promotion,
     });
@@ -169,5 +169,22 @@ export class OrdersService {
     order.isActive = false;
     await this.orderRepository.save(order);
   }
+
+  // orders.service.ts
+async getMonthlyRevenue(): Promise<any[]> {
+  const monthlyRevenue = await this.orderRepository
+      .createQueryBuilder('order')
+      .select("DATE_TRUNC('month', \"creationDate\")", 'month')
+      .addSelect('SUM(order.totalAmount)', 'revenue')
+      .where("DATE_PART('year', \"creationDate\") = DATE_PART('year', CURRENT_DATE)") // Chỉ lấy dữ liệu năm hiện tại
+      .groupBy('month')
+      .orderBy('month', 'ASC')
+      .getRawMany();
+
+  return monthlyRevenue.map(item => ({
+      month: new Date(item.month).toLocaleDateString('en-US', { month: '2-digit' }), // Định dạng tháng
+      revenue: parseFloat(item.revenue), // Chuyển đổi revenue sang số float
+  }));
+}
   
 }

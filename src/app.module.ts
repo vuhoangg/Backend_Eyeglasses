@@ -23,9 +23,7 @@ import { Category } from './category/entities/category.entity';
 import { Brand } from './brand/entities/brand.entity';
 import { ProductImage } from './product_image/entities/product_image.entity';
 import { Review } from './review/entities/review.entity';
-import { CartsModule } from './carts/carts.module';
 import { CartItemsModule } from './cart-items/cart-items.module';
-import { Cart } from './carts/entities/cart.entity';
 import { CartItem } from './cart-items/entities/cart-item.entity';
 import { OrderStatusModule } from './order-status/order-status.module';
 import { PromotionsModule } from './promotions/promotions.module';
@@ -40,8 +38,6 @@ import { Payment } from './payment/entities/payment.entity';
 import { PaymentStatusModule } from './payment-status/payment-status.module';
 import { PaymentStatus } from './payment-status/entities/payment-status.entity';
 
-
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -51,7 +47,7 @@ import { PaymentStatus } from './payment-status/entities/payment-status.entity';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, Cart, CartItem, Order, OrderItem, OrderStatus, Promotion, Payment ,PaymentStatus ],
+      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, CartItem, Order, OrderItem, OrderStatus, Promotion, Payment ,PaymentStatus ],
       synchronize: true,
       logging: true,
     }),
@@ -71,7 +67,6 @@ import { PaymentStatus } from './payment-status/entities/payment-status.entity';
     PermissionsModule,
     AuthModule,
     FilesModule,
-    CartsModule,
     CartItemsModule,
     OrderStatusModule,
     PromotionsModule,

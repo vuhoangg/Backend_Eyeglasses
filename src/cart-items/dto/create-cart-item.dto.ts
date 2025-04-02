@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator
 export class CreateCartItemDto {
   @IsNotEmpty()
   @IsNumber()
-  cart_id: number;
+  user_id: number;
 
   @IsNotEmpty()
   @IsNumber()

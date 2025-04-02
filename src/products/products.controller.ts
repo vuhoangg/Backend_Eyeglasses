@@ -95,4 +95,19 @@ export class ProductController {
       throw new NotFoundException(error.message);
     }
   }
+
+  // products.controller.ts
+@Get('best-selling')
+async getBestSellingProducts() {
+    try {
+        const products = await this.productService.getBestSellingProducts();
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Best selling products fetched successfully',
+            data: products,
+        };
+    } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+}
 }

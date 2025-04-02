@@ -11,7 +11,7 @@ import {
   } from 'typeorm';
   import { Role } from 'src/roles/entities/role.entity';
 import { Review } from 'src/review/entities/review.entity';
-import { Cart } from 'src/carts/entities/cart.entity';
+import { CartItem } from 'src/cart-items/entities/cart-item.entity';
   
   @Entity('users')
   export class User {
@@ -58,8 +58,8 @@ import { Cart } from 'src/carts/entities/cart.entity';
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
 
-  @OneToMany(() => Cart, (cart) => cart.user)
-  carts: Cart[];
+  @OneToMany(() => CartItem, (cartItem) => cartItem.user)
+  cartItems: CartItem[];
 
   
     @ManyToMany(() => Role, (role) => role.users)

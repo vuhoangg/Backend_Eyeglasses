@@ -19,6 +19,9 @@ export class Order {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ name: 'user_id' })
+    userId: number;
+
     @ManyToOne(() => User)
     @JoinColumn({ name: 'user_id' })
     user: User;

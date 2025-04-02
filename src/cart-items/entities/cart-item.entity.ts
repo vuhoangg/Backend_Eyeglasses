@@ -7,20 +7,25 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Cart } from 'src/carts/entities/cart.entity';
 import { Product } from 'src/products/entities/product.entity';
-
+import { User } from 'src/user/entities/user.entity';
 
 @Entity('cart_items')
 export class CartItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Cart, cart => cart.cartItems, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'cart_id' })
-  cart: Cart;
+  @Column({ nullable: true })
+  user_id: number;
 
-  @ManyToOne(() => Product, { eager: true })
+  @ManyToOne(() => User, user => user.cartItems, { onDelete: 'CASCADE', nullable: true })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @Column({ nullable: true })
+  product_id: number;
+
+  @ManyToOne(() => Product, { eager: true, nullable: true })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
@@ -44,5 +49,4 @@ export class CartItem {
 
   @Column({ default: true })
   isActive: boolean;
-
 }

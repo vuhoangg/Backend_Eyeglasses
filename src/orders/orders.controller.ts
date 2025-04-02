@@ -8,13 +8,17 @@ import {
   Query,
   ParseIntPipe,
   NotFoundException,
+  Request,
   HttpException,
   HttpStatus,
   Patch,
+  UseGuards,
+
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 interface QueryDto {
   user_id?: number;
@@ -28,9 +32,10 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) {
+  @UseGuards(JwtAuthGuard)
+  async create(@Body() createOrderDto: CreateOrderDto,@Request() req) {
       try {
-          const order = await this.ordersService.create(createOrderDto);
+          const order = await this.ordersService.create(createOrderDto, req.user.userId);
           return {
               statusCode: HttpStatus.CREATED,
               message: 'Order created successfully',
@@ -107,4 +112,19 @@ export class OrdersController {
           throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
   }
+
+  // orders.controller.ts
+@Get('monthly-revenue')
+async getMonthlyRevenue() {
+    try {
+        const revenueData = await this.ordersService.getMonthlyRevenue();
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Monthly revenue fetched successfully',
+            data: revenueData,
+        };
+    } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+}
 }

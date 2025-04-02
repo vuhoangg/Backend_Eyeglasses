@@ -121,4 +121,23 @@ export class ProductService {
     product.isActive = false;
     await this.productRepository.save(product);
   }
+
+
+  // products.service.ts
+async getBestSellingProducts(): Promise<any[]> {
+  const products = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoin('product.orderItems', 'orderItem')
+      .select('product.name', 'productName')
+      .addSelect('SUM(orderItem.quantity)', 'quantitySold')
+      .groupBy('product.id')
+      .orderBy('quantitySold', 'DESC')
+      .limit(5) // Giới hạn số lượng sản phẩm bán chạy hiển thị (ví dụ: 5)
+      .getRawMany();
+
+  return products.map(product => ({
+      productName: product.productName,
+      quantitySold: parseInt(product.quantitySold, 10) // Chuyển đổi quantitySold sang số
+  }));
+}
 }
