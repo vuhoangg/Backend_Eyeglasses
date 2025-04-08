@@ -130,78 +130,81 @@ export class ProductService {
 
 
   async getBestSellingProducts(): Promise<any[]> { // Phiên bản thủ công hơn - ĐÃ SỬA HOÀN CHỈNH
-    console.log("ProductService: getBestSellingProducts function START"); // <--- ADD THIS LOG
+    console.log("ProductService: getBestSellingProducts function START");
 
     try {
       // --- DATABASE CONNECTION TEST ---
       try {
-        console.log("ProductService: Database connection test - START"); // <--- ADD THIS LOG
+        console.log("ProductService: Database connection test - START");
         await this.productRepository.query('SELECT 1'); // Simple test query
-        console.log("ProductService: Database connection test - SUCCESSFUL"); // <--- ADD THIS LOG
+        console.log("ProductService: Database connection test - SUCCESSFUL");
       } catch (dbError) {
-        console.error("ProductService: Database connection test - FAILED:", dbError); // <--- ADD THIS LOG
-        throw new Error("Database connection failed. See server logs for details."); // Throw error to signal DB issue
+        console.error("ProductService: Database connection test - FAILED:", dbError);
+        throw new Error("Database connection failed. See server logs for details.");
       }
       // --- END DATABASE CONNECTION TEST ---
 
-
-      // 1. Lấy tất cả OrderItems (có thể cần giới hạn nếu bảng order_items rất lớn)
+      // 1. Lấy tất cả OrderItems
       const allOrderItems = await this.orderItemRepository.find({
-        relations: ['product'], // Load thông tin product để dùng sau
+        relations: ['product'], // Load product relation
       });
-      console.log("ProductService: Fetched allOrderItems - Count:", allOrderItems.length); // <--- ADD THIS LOG
+      console.log("ProductService: Fetched allOrderItems - Count:", allOrderItems.length);
 
-      // 2. Tạo một Map để đếm số lượng sản phẩm đã bán cho mỗi productId
+      // 2. Đếm số lượng sản phẩm đã bán cho mỗi productId
       const productSalesCount = new Map<number, number>();
-
       for (const orderItem of allOrderItems) {
         const productId = orderItem.product.id;
         const quantity = orderItem.quantity;
-
-        if (productSalesCount.has(productId)) {
-          productSalesCount.set(productId, (productSalesCount.get(productId) ?? 0) + quantity);
-        } else {
-          productSalesCount.set(productId, quantity);
-        }
+        productSalesCount.set(productId, (productSalesCount.get(productId) || 0) + quantity);
       }
-      console.log("ProductService: Calculated productSalesCount - Map size:", productSalesCount.size); // <--- ADD THIS LOG
+      console.log("ProductService: Calculated productSalesCount - Map size:", productSalesCount.size);
 
-
-      // 3. Chuyển Map thành Array và sắp xếp theo số lượng bán giảm dần
+      // 3. Sắp xếp sản phẩm theo số lượng bán giảm dần
       const sortedProductSales = Array.from(productSalesCount.entries()).sort(
-        ([productIdA, quantityA], [productIdB, quantityB]) => quantityB - quantityA
+        ([, quantityA], [, quantityB]) => quantityB - quantityA
       );
-      console.log("ProductService: Sorted productSales - Top 3:", sortedProductSales.slice(0, 3)); // <--- ADD THIS LOG (top 3 for brevity)
+      console.log("ProductService: Sorted productSales - Top 3:", sortedProductSales.slice(0, 3));
 
+      // 4. Lấy top 5 product IDs bán chạy nhất
+      const topSellingProductIds = sortedProductSales.slice(0, 8).map(([productId]) => productId);
+      console.log("ProductService: Top Selling Product IDs:", topSellingProductIds);
 
-      // 4. Lấy top 5 sản phẩm bán chạy nhất (hoặc ít hơn nếu có ít sản phẩm hơn 5)
-      const topSellingProductIds = sortedProductSales.slice(0, 5).map(([productId, quantity]) => productId);
-      console.log("ProductService: Top Selling Product IDs:", topSellingProductIds); // <--- ADD THIS LOG
-
-
-      // 5. Lấy thông tin chi tiết của top sản phẩm từ bảng Product
+      // 5. **Lấy đầy đủ thông tin chi tiết của top sản phẩm từ bảng Product, including relations**
       const topSellingProductsDetails = await this.productRepository.find({
         where: { id: In(topSellingProductIds) },
+        relations: ['category', 'brand'], // **Load category and brand relations here**
       });
-      console.log("ProductService: Fetched topSellingProductsDetails - Count:", topSellingProductsDetails.length); // <--- ADD THIS LOG
+      console.log("ProductService: Fetched topSellingProductsDetails - Count:", topSellingProductsDetails.length);
 
-
-      // 6. Kết hợp thông tin sản phẩm và số lượng bán để trả về kết quả
+      // 6. **Combine full product details with quantitySold**
       const bestSellingProductsData = topSellingProductsDetails.map(product => {
         return {
-          productName: product.name,
-          quantitySold: productSalesCount.get(product.id) || 0, // Lấy số lượng bán từ Map
+          ...instanceToPlain(product), // Include ALL product details
+          quantitySold: productSalesCount.get(product.id) || 0, // Add quantitySold
         };
       });
-      console.log("ProductService: Created bestSellingProductsData - Count:", bestSellingProductsData.length); // <--- ADD THIS LOG
+      console.log("ProductService: Created bestSellingProductsData - Count:", bestSellingProductsData.length);
 
-
-      console.log("ProductService: getBestSellingProducts function END - Success"); // <--- ADD THIS LOG
+      console.log("ProductService: getBestSellingProducts function END - Success");
       return bestSellingProductsData;
 
+
     } catch (error) {
-      console.error("ProductService: getBestSellingProducts function ERROR:", error); // <--- ADD THIS LOG (whole error object)
-      throw error; // Hoặc xử lý lỗi theo cách phù hợp với ứng dụng của bạn
+      console.error("ProductService: getBestSellingProducts function ERROR:", error);
+      throw error;
     }
   }
+
+
+  async getLatestProducts(): Promise<any> {
+    const latestProducts = await this.productRepository.find({
+      where: { isActive: true },
+      order: { creationDate: 'DESC' },
+      take: 4, // Limit to 5 latest products
+      relations: ['category', 'brand'], // Optional: Load relations if needed
+    });
+    return instanceToPlain(latestProducts);
+  }
+
+
 }

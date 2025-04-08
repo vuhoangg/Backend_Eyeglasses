@@ -55,6 +55,23 @@ export class OrderItemsController {
           throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
   }
+  @Get('by-order/:orderId')
+  async findAllByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
+    try {
+      const orderItems = await this.orderItemsService.findAllByOrderId(orderId);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'OrderItems fetched successfully by Order ID',
+        data: orderItems.data, // Return only the data array, adjust as needed
+        total: orderItems.total, // Optionally return total count
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {

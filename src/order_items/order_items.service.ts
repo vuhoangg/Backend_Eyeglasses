@@ -101,6 +101,26 @@ export class OrderItemsService {
 
     return instanceToPlain(orderItem);
   }
+  
+  async findAllByOrderId(orderId: number): Promise<any> {
+    const where: FindOptionsWhere<OrderItem> = {
+      isActive: true, // Default to only active orderItems
+      order: { id: orderId }, // Filter by orderId
+    };
+
+    const [data, total] = await this.orderItemRepository.findAndCount({
+      where,
+      order: {
+        creationDate: 'DESC',
+      },
+      relations: ['order', 'product'], // Ensure relations are loaded
+    });
+
+    return {
+      total,
+      data: instanceToPlain(data),
+    };
+  }
 
   async update(id: number, updateOrderItemDto: UpdateOrderItemDto): Promise<any> {
     const orderItem = await this.orderItemRepository.findOne({ where: { id } });

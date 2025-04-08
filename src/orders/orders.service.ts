@@ -104,17 +104,29 @@ export class OrdersService {
     };
   }
 
-  async findOne(id: number): Promise<any> {
+  // async findOne(id: number): Promise<any> {
+  //   const order = await this.orderRepository.findOne({
+  //     where: { id, isActive: true  },
+  //     relations: ['user', 'orderStatus', 'promotion', 'orderItems'],
+  //   });
+
+  //   if (!order) {
+  //     throw new NotFoundException(`Order with ID ${id} not found`);
+  //   }
+
+  //   return instanceToPlain(order);
+  // }
+  async findOne(orderId: number): Promise<Order> {
     const order = await this.orderRepository.findOne({
-      where: { id,isActive: true  },
-      relations: ['user', 'orderStatus', 'promotion', 'orderItems'],
+      where: { id: orderId },
+      relations: ['user', 'orderStatus', 'promotion', 'orderItems'], // ⚡ Thêm orderItems vào
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
+      throw new NotFoundException(`Order with ID ${orderId} not found`);
     }
 
-    return instanceToPlain(order);
+    return order;
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<any> {

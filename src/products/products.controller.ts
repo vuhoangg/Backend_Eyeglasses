@@ -65,6 +65,20 @@ async getBestSellingProducts() {
     }
 }
 
+@Get('latest') // New endpoint for latest products
+  async getLatestProducts() {
+    try {
+      const products = await this.productService.getLatestProducts();
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Latest products fetched successfully',
+        data: products,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
