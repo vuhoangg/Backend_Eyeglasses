@@ -39,7 +39,7 @@ export class UserController {
     };
   }
 
-  // @Roles('admin') // Yêu cầu role "admin" để tạo user
+  @Roles('admin') // Yêu cầu role "admin" để tạo user
   @Get()
   async findAll(@Query() query: QueryDto) {
     try {

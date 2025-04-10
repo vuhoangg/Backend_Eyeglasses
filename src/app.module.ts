@@ -37,6 +37,12 @@ import { PaymentModule } from './payment/payment.module';
 import { Payment } from './payment/entities/payment.entity';
 import { PaymentStatusModule } from './payment-status/payment-status.module';
 import { PaymentStatus } from './payment-status/entities/payment-status.entity';
+import { VendorsModule } from './vendors/vendors.module';
+import { ImportReceiptsModule } from './import-receipts/import-receipts.module';
+import { ImportReceiptDetail } from './import-receipts/entities/import-receipt-detail.entity';
+import { ImportReceipt } from './import-receipts/entities/import-receipt.entity';
+import { Vendor } from './vendors/entities/vendor.entity';
+
 
 @Module({
   imports: [
@@ -47,7 +53,7 @@ import { PaymentStatus } from './payment-status/entities/payment-status.entity';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, CartItem, Order, OrderItem, OrderStatus, Promotion, Payment ,PaymentStatus ],
+      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, CartItem, Order, OrderItem, OrderStatus, Promotion, Payment ,PaymentStatus , Vendor, ImportReceipt, ImportReceiptDetail ],
       synchronize: true,
       logging: true,
     }),
@@ -74,6 +80,9 @@ import { PaymentStatus } from './payment-status/entities/payment-status.entity';
     OrdersModule,
     PaymentModule,
     PaymentStatusModule,
+    VendorsModule,
+    ImportReceiptsModule,
+  
   
   ],
   controllers: [AppController],
