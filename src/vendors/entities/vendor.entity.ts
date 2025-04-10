@@ -1,4 +1,5 @@
 
+//entities/vendor.entity.ts
 import { ImportReceipt } from 'src/import-receipts/entities/import-receipt.entity';
 import {
   Entity,
