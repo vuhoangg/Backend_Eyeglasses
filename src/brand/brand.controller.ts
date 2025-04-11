@@ -1,13 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException, Query, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException, Query, ParseIntPipe, NotFoundException, UseGuards } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { QueryDto } from './dto/query.dto';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('brand')
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
+  @Roles('admin', 'staff') 
   @Post()
   async create(@Body() createBrandDto: CreateBrandDto) {
     try {
@@ -53,6 +58,7 @@ export class BrandController {
     }
   }
 
+  @Roles('admin') 
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -70,6 +76,7 @@ export class BrandController {
     }
   }
 
+  @Roles('admin') 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     try {

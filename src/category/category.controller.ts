@@ -1,14 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException, NotFoundException, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException, NotFoundException, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryService } from './category.service';
 import { QueryDto } from './dto/query.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('category')
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @Roles('admin', 'staff')
   @Post()
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     try {
@@ -54,6 +59,7 @@ export class CategoryController {
     }
   }
 
+  @Roles('admin') 
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -71,6 +77,8 @@ export class CategoryController {
     }
   }
 
+
+  @Roles('admin') 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     try {

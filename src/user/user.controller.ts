@@ -24,11 +24,12 @@ import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 @Controller('user')
-// @UseGuards(JwtAuthGuard, RolesGuard) 
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // @UseGuards(JwtAuthGuard)
+
+  @Roles('admin') 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
@@ -39,7 +40,7 @@ export class UserController {
     };
   }
 
-  @Roles('admin') // Yêu cầu role "admin" để tạo user
+  @Roles('admin', 'staff') 
   @Get()
   async findAll(@Query() query: QueryDto) {
     try {
@@ -66,6 +67,7 @@ export class UserController {
   }
 
 
+
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -89,7 +91,7 @@ export class UserController {
   }
 
 
-
+  @Roles('admin') 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     try {

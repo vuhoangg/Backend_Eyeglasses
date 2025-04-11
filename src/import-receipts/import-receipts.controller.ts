@@ -20,18 +20,21 @@ import { CreateImportReceiptDto } from './dto/create-import-receipt.dto';
 import { UpdateImportReceiptDto } from './dto/update-import-receipt.dto';
 import { QueryImportReceiptDto } from './dto/query-import-receipt.dto';
 import { ImportReceiptService } from './import-receipts.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 // import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; // Ví dụ import Guard
 
 @Controller('import-receipts') // Đổi tên route
-// @UseGuards(JwtAuthGuard) // Ví dụ áp dụng Guard cho toàn bộ controller
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class ImportReceiptController {
   constructor(private readonly importReceiptService: ImportReceiptService) {}
 
+
+  @Roles('admin', 'staff') 
   @Post()
-  // @UseGuards(JwtAuthGuard) // Áp dụng Guard cho route cụ thể
   async create(
       @Body() createImportReceiptDto: CreateImportReceiptDto,
-      // @Request() req // Lấy req nếu dùng Guard và cần user id
       ) {
     try {
         // const userId = req.user.userId; // Lấy userId từ payload JWT (ví dụ)
@@ -52,6 +55,7 @@ export class ImportReceiptController {
     }
   }
 
+  @Roles('admin', 'staff') 
   @Get()
   async findAll(@Query() query: QueryImportReceiptDto) {
     try {
@@ -89,6 +93,7 @@ export class ImportReceiptController {
     }
   }
 
+  @Roles('admin') 
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -112,6 +117,7 @@ export class ImportReceiptController {
     }
   }
 
+  @Roles('admin') 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id', ParseIntPipe) id: number) {

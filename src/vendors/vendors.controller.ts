@@ -19,19 +19,21 @@ import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { QueryVendorDto } from './dto/query-vendor.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 // import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; // Ví dụ Guard xác thực
 // import { RolesGuard } from 'src/auth/roles.guard';     // Ví dụ Guard phân quyền
 // import { Roles } from 'src/auth/roles.decorator';   // Ví dụ Decorator gán quyền
 
-@Controller('vendors') // Định nghĩa route gốc là /vendors
-// @UseGuards(JwtAuthGuard, RolesGuard) // Áp dụng Guard cho toàn bộ controller nếu cần
+@Controller('vendors') 
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class VendorsController {
   // Tiêm VendorsService vào controller
   constructor(private readonly vendorsService: VendorsService) {}
 
-  // Endpoint tạo mới Vendor (POST /vendors)
+  @Roles('admin', 'staff') 
   @Post()
-  // @Roles('admin', 'manager') // Ví dụ: Chỉ admin/manager được tạo
   async create(@Body() createVendorDto: CreateVendorDto) {
     try {
       const vendor = await this.vendorsService.create(createVendorDto);
@@ -49,9 +51,8 @@ export class VendorsController {
     }
   }
 
-  // Endpoint lấy danh sách Vendors (GET /vendors?page=1&limit=10&name=ABC)
+  @Roles('admin', 'staff') 
   @Get()
-  // @Roles('admin', 'manager') // Ví dụ: Chỉ admin/manager được xem danh sách
   async findAll(@Query() query: QueryVendorDto) {
      try {
        const result = await this.vendorsService.findAll(query);
@@ -86,9 +87,8 @@ export class VendorsController {
     }
   }
 
-  // Endpoint cập nhật Vendor (PATCH /vendors/:id)
+  @Roles('admin') 
   @Patch(':id')
-  // @Roles('admin', 'manager') // Ví dụ: Chỉ admin/manager được cập nhật
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateVendorDto: UpdateVendorDto) {
      try {
         const updatedVendor = await this.vendorsService.update(id, updateVendorDto);
@@ -106,10 +106,10 @@ export class VendorsController {
     }
   }
 
-  // Endpoint xóa Vendor (DELETE /vendors/:id) - Xóa mềm
+ 
+  @Roles('admin') 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // Trả về 204 No Content khi xóa thành công
-  // @Roles('admin', 'manager') // Ví dụ: Chỉ admin/manager được xóa
+  @HttpCode(HttpStatus.NO_CONTENT) 
   async remove(@Param('id', ParseIntPipe) id: number) {
     try {
         await this.vendorsService.remove(id);

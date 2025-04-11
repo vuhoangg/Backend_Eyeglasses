@@ -12,6 +12,7 @@ import {
   Query,
   NotFoundException,
   HttpException,
+  UseGuards,
 } from '@nestjs/common';
 
 import { CreateProductDto } from './dto/create-product.dto';
@@ -19,11 +20,16 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 import { ProductService } from './products.service';
 import { QueryDto } from './dto/query.dto';
-
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+@UseGuards(JwtAuthGuard, RolesGuard) 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+
+  @Roles('admin') 
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
     try {
@@ -51,6 +57,8 @@ export class ProductController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+
   @Get('best-selling')
 async getBestSellingProducts() {
     try {
@@ -64,6 +72,7 @@ async getBestSellingProducts() {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
 }
+
 
 @Get('latest') // New endpoint for latest products
   async getLatestProducts() {
@@ -93,6 +102,7 @@ async getBestSellingProducts() {
     }
   }
 
+  @Roles('admin') 
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -110,6 +120,7 @@ async getBestSellingProducts() {
     }
   }
 
+  @Roles('admin') 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     try {

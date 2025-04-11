@@ -19,6 +19,8 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 interface QueryDto {
   user_id?: number;
@@ -27,12 +29,16 @@ interface QueryDto {
   limit?: number;
 }
 
+
 @Controller('orders')
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
+
+ 
   async create(@Body() createOrderDto: CreateOrderDto,@Request() req) {
       try {
           const order = await this.ordersService.create(createOrderDto, req.user.userId);
@@ -59,6 +65,8 @@ export class OrdersController {
           throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
   }
+
+
   @Get('monthly-revenue')
 async getMonthlyRevenue() {
     try {
@@ -90,6 +98,8 @@ async getMonthlyRevenue() {
       }
   }
 
+
+  @Roles('admin') // Yêu cầu role "admin" để tạo user
   @Patch(':id')
   async update(
       @Param('id', ParseIntPipe) id: number,
@@ -110,6 +120,7 @@ async getMonthlyRevenue() {
       }
   }
 
+  @Roles('admin') 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
       try {
