@@ -24,7 +24,7 @@ import { Role } from 'src/roles/entities/role.entity';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_ACCESS_TOKEN_SECRET') || "JUSTSECRET" , // Sử dụng 'secret'
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRE') || '1h', // Thời gian hết hạn
+          expiresIn: configService.get<string>('JWT_EXPIRE') || '10h', // Thời gian hết hạn
         },
       }),
       inject: [ConfigService],

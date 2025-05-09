@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, DataSource } from 'typeorm';
+import { Repository, FindOptionsWhere, DataSource, Brackets } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -10,6 +10,7 @@ import { OrderStatus } from 'src/order-status/entities/order-status.entity';
 import { Promotion } from 'src/promotions/entities/promotion.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { OrderItem } from 'src/order_items/entities/order_item.entity';
+import { QueryOrderDto, SortOrderEnum } from './dto/query-order.dto';
 
 interface QueryDto {
   user_id?: number;
@@ -75,57 +76,96 @@ export class OrdersService {
     return instanceToPlain(newOrder);
   }
 
-  async findAll(query: QueryDto): Promise<any> {
-    const where: FindOptionsWhere<Order> = {
-      isActive: true, // Default to only active orders
-    };
-    const { user_id, order_status_id, isActive, page = 1, limit = 10 } = query;
+  
 
-    if (user_id) {
-      where.user = { id: user_id };
-    }
+  async findAll(query: QueryOrderDto): Promise<any> { // Sử dụng QueryOrderDto
+    const {
+      page = 1, // Mặc định từ DTO
+      limit = 10, // Mặc định từ DTO
+      // user_id, // Bạn có thể giữ lại nếu cần lọc theo user_id cụ thể cho 1 trang nào đó (vd: "Đơn hàng của tôi")
+      customerName, // Thêm để tìm kiếm theo tên khách hàng
+      order_status_id,
+      orderIdentifier, // <<<<<< LẤY GIÁ TRỊ MỚI
+      isActive,
+      sortBy = 'creationDate', // Mặc định từ DTO
+      sortOrder = SortOrderEnum.DESC, // Mặc định từ DTO
+    } = query;
 
+    // Sử dụng QueryBuilder để có thể join và tìm kiếm phức tạp hơn
+    const queryBuilder = this.orderRepository.createQueryBuilder('order')
+      .leftJoinAndSelect('order.user', 'user') // Join với User để tìm kiếm theo tên user
+      .leftJoinAndSelect('order.orderStatus', 'orderStatus')
+      .leftJoinAndSelect('order.promotion', 'promotion')
+      .leftJoinAndSelect('order.orderItems', 'orderItems') // Join orderItems
+      .leftJoinAndSelect('orderItems.product', 'product'); // Join product từ orderItems
+
+    // 1. Lọc theo isActive (mặc định là true nếu không được cung cấp)
     if (isActive !== undefined) {
-      where.isActive = isActive;
+      queryBuilder.where('order.isActive = :isActive', { isActive });
+    } else {
+      queryBuilder.where('order.isActive = :isActive', { isActive: true }); // Mặc định chỉ lấy đơn hàng active
     }
 
+    // 2. Lọc theo tên khách hàng (nếu có)
+    // Tìm kiếm trên username, firstName, lastName của User
+    if (customerName) {
+      queryBuilder.andWhere(new Brackets(qb => { // Sử dụng Brackets để nhóm các điều kiện OR
+        qb.where('user.username ILIKE :customerNameParam', { customerNameParam: `%${customerName}%` })
+          .orWhere('user.firstName ILIKE :customerNameParam', { customerNameParam: `%${customerName}%` })
+          .orWhere('user.lastName ILIKE :customerNameParam', { customerNameParam: `%${customerName}%` })
+          // Tùy chọn: Tìm kiếm cả họ và tên ghép lại
+          .orWhere("CONCAT(user.firstName, ' ', user.lastName) ILIKE :customerNameParam", { customerNameParam: `%${customerName}%` });
+      }));
+    }
+
+    // 3. Lọc theo trạng thái đơn hàng (nếu có)
     if (order_status_id) {
-      where.orderStatus = { id: order_status_id };
+      queryBuilder.andWhere('orderStatus.id = :statusId', { statusId: order_status_id });
     }
 
-    const [data, total] = await this.orderRepository.findAndCount({
-      where,
-      skip: (page - 1) * limit,
-      take: limit,
-      order: {
-        creationDate: 'DESC',
-      },
-      relations: ['user', 'orderStatus', 'promotion', 'orderItems'],
-    });
+    // 4. Sắp xếp
+    // Cần định nghĩa các trường được phép sắp xếp để tránh lỗi SQL Injection hoặc lỗi không mong muốn
+    const allowedSortFieldsOrder = ['id', 'totalAmount', 'creationDate', 'modifiedDate'];
+    const allowedSortFieldsUser = ['username', 'firstName', 'lastName']; // Trường hợp muốn sort theo tên user
+    const allowedSortFieldsStatus = ['name']; // Trường hợp muốn sort theo tên trạng thái
+
+    let validSortBy = 'order.creationDate'; // Mặc định
+    const sortOrderNormalized = sortOrder.toUpperCase() as 'ASC' | 'DESC';
+
+    if (allowedSortFieldsOrder.includes(sortBy)) {
+      validSortBy = `order.${sortBy}`;
+    } else if (sortBy === 'customerName' && allowedSortFieldsUser.includes('username')) { // Ví dụ sort theo tên user
+      validSortBy = 'user.username'; // Giả định bạn muốn sort theo username
+    } else if (sortBy === 'statusName' && allowedSortFieldsStatus.includes('name')) {
+        validSortBy = 'orderStatus.name';
+    }
+    // Bạn có thể thêm các điều kiện else if khác cho các trường hợp sort phức tạp hơn
+
+    queryBuilder.orderBy(validSortBy, sortOrderNormalized);
+
+    // Thêm một trường sắp xếp phụ để đảm bảo thứ tự nhất quán nếu các giá trị của trường sort chính bị trùng
+    if (validSortBy !== 'order.id') {
+        queryBuilder.addOrderBy('order.id', 'DESC'); // Hoặc 'ASC' tùy theo logic của bạn
+    }
+
+
+    // 5. Phân trang
+    queryBuilder.skip((page - 1) * limit).take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     const totalPage = Math.ceil(total / limit);
 
     return {
       total,
       totalPage,
-      page,
-      limit,
-      data: instanceToPlain(data),
+      currentPage: Number(page), // Đảm bảo page và limit là number
+      limit: Number(limit),
+      data: instanceToPlain(data), // instanceToPlain để loại bỏ các decorator không cần thiết
     };
   }
 
-  // async findOne(id: number): Promise<any> {
-  //   const order = await this.orderRepository.findOne({
-  //     where: { id, isActive: true  },
-  //     relations: ['user', 'orderStatus', 'promotion', 'orderItems'],
-  //   });
-
-  //   if (!order) {
-  //     throw new NotFoundException(`Order with ID ${id} not found`);
-  //   }
-
-  //   return instanceToPlain(order);
-  // }
+ 
   async findOne(orderId: number): Promise<Order> {
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
@@ -139,47 +179,7 @@ export class OrdersService {
     return order;
   }
 
-  // async update(id: number, updateOrderDto: UpdateOrderDto): Promise<any> {
-  //   const order = await this.orderRepository.findOne({
-  //     where: { id },
-  //     relations: ['user', 'orderStatus', 'promotion'],
-  //   });
-
-  //   if (!order) {
-  //     throw new NotFoundException(`Order with ID ${id} not found`);
-  //   }
-
-  //   const { user_id, order_status_id, promotion_id, ...orderData } = updateOrderDto;
-
-  //   if (user_id) {
-  //     const user = await this.userRepository.findOneBy({ id: user_id });
-  //     if (!user) {
-  //       throw new NotFoundException(`User with ID ${user_id} not found`);
-  //     }
-  //     order.user = user;
-  //   }
-  //   if (order_status_id) {
-  //     const orderStatus = await this.orderStatusRepository.findOneBy({ id: order_status_id });
-  //     if (!orderStatus) {
-  //       throw new NotFoundException(`OrderStatus with ID ${order_status_id} not found`);
-  //     }
-  //     order.orderStatus = orderStatus;
-  //   }
-
-  //   if (promotion_id) {
-  //     const promotion = await this.promotionRepository.findOneBy({ id: promotion_id });
-  //     if (!promotion) {
-  //       throw new NotFoundException(`Promotion with ID ${promotion_id} not found`);
-  //     }
-  //     order.promotion = promotion;
-  //   }
-
-  //   Object.assign(order, orderData);
-
-  //   const updatedOrder = await this.orderRepository.save(order);
-  //   return instanceToPlain(updatedOrder);
-  // }
-
+  
   // --- Cập nhật phương thức update ---
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<any> {
     // --- Bắt đầu Transaction ---
