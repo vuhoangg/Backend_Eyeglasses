@@ -36,6 +36,7 @@ export class OrderStatusService {
     }
 
     const [data, total] = await this.orderStatusRepository.findAndCount({
+      where,
       skip: (page - 1) * limit,
       take: limit,
       order: {

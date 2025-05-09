@@ -93,7 +93,7 @@ export class ImportReceiptController {
     }
   }
 
-  @Roles('admin') 
+  @Roles('admin', 'staff') 
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -117,7 +117,7 @@ export class ImportReceiptController {
     }
   }
 
-  @Roles('admin') 
+  @Roles('admin', 'staff')
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id', ParseIntPipe) id: number) {

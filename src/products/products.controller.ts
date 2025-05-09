@@ -23,12 +23,13 @@ import { QueryDto } from './dto/query.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
-@UseGuards(JwtAuthGuard, RolesGuard) 
+
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
 
+  @UseGuards(JwtAuthGuard, RolesGuard) 
   @Roles('admin') 
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
@@ -44,6 +45,7 @@ export class ProductController {
     }
   }
  
+
   @Get()
   async findAll(@Query() query: QueryDto) {
     try {
@@ -120,6 +122,7 @@ async getBestSellingProducts() {
     }
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard) 
   @Roles('admin') 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {

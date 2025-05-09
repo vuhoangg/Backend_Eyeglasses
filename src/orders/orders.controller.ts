@@ -99,7 +99,7 @@ async getMonthlyRevenue() {
   }
 
 
-  @Roles('admin') // Yêu cầu role "admin" để tạo user
+  @Roles('admin', 'staff')
   @Patch(':id')
   async update(
       @Param('id', ParseIntPipe) id: number,
@@ -120,7 +120,7 @@ async getMonthlyRevenue() {
       }
   }
 
-  @Roles('admin') 
+  @Roles('admin', 'staff')
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
       try {

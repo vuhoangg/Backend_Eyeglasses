@@ -41,4 +41,15 @@ export class QueryImportReceiptDto {
     @Type(() => Number)
     @Min(1)
     limit?: number = 10;
+
+     // THÊM CÁC THUỘC TÍNH NÀY
+  @IsOptional()
+  @IsString()
+  sortBy?: string; // Ví dụ: 'creationDate', 'importDate', 'totalAmount'
+
+  @IsOptional()
+  @IsString()
+  @IsEnum(['ASC', 'DESC'])
+  sortOrder?: 'ASC' | 'DESC';
+  
 }

@@ -10,8 +10,8 @@ export class CreateRoleDto {
   @IsString()
   description?: string;
 
-  @IsOptional()
-  @IsArray() // Add validation for roles
-  @Type(() => Number)
-  permissions?: number[]; // Array of role IDs
+  // @IsOptional()
+  // @IsArray() // Add validation for roles
+  // @Type(() => Number)
+  // permissions?: number[]; // Array of role IDs
 }

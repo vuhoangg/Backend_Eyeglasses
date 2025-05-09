@@ -20,17 +20,13 @@ export class RolesService {
   ) {}
 
   async create(createRoleDto: CreateRoleDto): Promise<Role> {
-    const {permissions , ...roleDetails } =  createRoleDto;
+    const { ...roleDetails } =  createRoleDto;
     const role = this.roleRepository.create({
       ...roleDetails,
       permissions: [] ,
     });
 
-    if (permissions && permissions.length > 0) {
-      // Find roles by IDs
-      const foundPermissions  = await this.permissionRepository.findByIds(permissions);
-      role.permissions = foundPermissions; // Assign roles to the user
-    }
+   
     return await this.roleRepository.save(role);
   }
 
@@ -76,7 +72,7 @@ export class RolesService {
   async update(id: number, updateRoleDto: UpdateRoleDto): Promise<any> {
     const role = await this.roleRepository.findOne({
         where: { id },
-        relations: ['permissions'], // Nạp sẵn danh sách roles
+        // relations: ['permissions'], // Nạp sẵn danh sách roles
     });
 
     if (!role) {
@@ -84,17 +80,17 @@ export class RolesService {
     }
     role.name = updateRoleDto.name?? role.name;
     role.description = updateRoleDto.description ?? role.description;
-    if (updateRoleDto.permissions && Array.isArray(updateRoleDto.permissions) && updateRoleDto.permissions.length > 0) {
-        const permissions = await this.permissionRepository.find({
-            where: { id: In(updateRoleDto.permissions) },
-        });
+    // if (updateRoleDto.permissions && Array.isArray(updateRoleDto.permissions) && updateRoleDto.permissions.length > 0) {
+    //     const permissions = await this.permissionRepository.find({
+    //         where: { id: In(updateRoleDto.permissions) },
+    //     });
 
-        if (permissions.length !== updateRoleDto.permissions.length) {
-            throw new NotFoundException('Một hoặc nhiều vai trò không hợp lệ');
-        }
+    //     if (permissions.length !== updateRoleDto.permissions.length) {
+    //         throw new NotFoundException('Một hoặc nhiều vai trò không hợp lệ');
+    //     }
 
-        role.permissions = permissions;
-    }
+    //     role.permissions = permissions;
+    // }
   }
    
   async delete(id: number): Promise<void> {

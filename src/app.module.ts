@@ -7,7 +7,7 @@ import { Admin } from './admins/entities/admin.entity';
 import { ProductsModule } from './products/products.module';
 import { CategoryModule } from './category/category.module';
 import { BrandModule } from './brand/brand.module';
-import { ProductImageModule } from './product_image/product_image.module';
+// import { ProductImageModule } from './product_image/product_image.module';
 import { ReviewModule } from './review/review.module';
 import { UserModule } from './user/user.module';
 import { RolesModule } from './roles/roles.module';
@@ -21,7 +21,7 @@ import { ConfigModule } from '@nestjs/config';
 import { FilesModule } from './files/files.module';
 import { Category } from './category/entities/category.entity';
 import { Brand } from './brand/entities/brand.entity';
-import { ProductImage } from './product_image/entities/product_image.entity';
+// import { ProductImage } from './product_image/entities/product_image.entity';
 import { Review } from './review/entities/review.entity';
 import { CartItemsModule } from './cart-items/cart-items.module';
 import { CartItem } from './cart-items/entities/cart-item.entity';
@@ -53,7 +53,7 @@ import { Vendor } from './vendors/entities/vendor.entity';
       username: 'root',
       password: '',
       database: 'eyeglasses_4',
-      entities: [User, Role, Product, Permission, Category, Brand ,ProductImage, Review, CartItem, Order, OrderItem, OrderStatus, Promotion, Payment ,PaymentStatus , Vendor, ImportReceipt, ImportReceiptDetail ],
+      entities: [User, Role, Product, Permission, Category, Brand , Review, CartItem, Order, OrderItem, OrderStatus, Promotion, Payment ,PaymentStatus , Vendor, ImportReceipt, ImportReceiptDetail ],
       synchronize: true,
       logging: true,
     }),
@@ -66,7 +66,7 @@ import { Vendor } from './vendors/entities/vendor.entity';
     ProductsModule,
     CategoryModule,
     BrandModule,
-    ProductImageModule,
+  
     ReviewModule,
     UserModule,
     RolesModule,

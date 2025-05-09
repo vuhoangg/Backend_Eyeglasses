@@ -12,7 +12,7 @@ import {
 // import { OrderItem } from 'src/order_items/entities/order_item.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Brand } from 'src/brand/entities/brand.entity';
-import { ProductImage } from 'src/product_image/entities/product_image.entity';
+// import { ProductImage } from 'src/product_image/entities/product_image.entity';
 import { Review } from 'src/review/entities/review.entity';
   
   @Entity('products') // Matches the table name in SQL
@@ -67,8 +67,8 @@ import { Review } from 'src/review/entities/review.entity';
     @Column({ nullable: true })
     sku: string;
 
-    @OneToMany(() => ProductImage, (productImage) => productImage.product)
-    productImages: ProductImage[];
+    // @OneToMany(() => ProductImage, (productImage) => productImage.product)
+    // productImages: ProductImage[];
 
     // @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
     // orderItems: OrderItem[];

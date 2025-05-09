@@ -87,7 +87,7 @@ export class VendorsController {
     }
   }
 
-  @Roles('admin') 
+  @Roles('admin', 'staff') 
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateVendorDto: UpdateVendorDto) {
      try {
@@ -107,7 +107,7 @@ export class VendorsController {
   }
 
  
-  @Roles('admin') 
+  @Roles('admin', 'staff') 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT) 
   async remove(@Param('id', ParseIntPipe) id: number) {
